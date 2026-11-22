@@ -2,9 +2,10 @@
 from fastmcp import FastMCP
 import os
 import sqlite3
+import tempfile
 
 # Database path
-DB_PATH = os.path.join(os.path.dirname(__file__), "expenses.db")
+DB_PATH = os.environ.get("EXPENSE_DB_PATH",os.path.join(tempfile.gettempdir(), "expenses.db"))
 
 # Categories JSON Path
 CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "../../categories.json")
