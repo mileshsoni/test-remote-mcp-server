@@ -4,15 +4,27 @@ import os
 import aiosqlite
 import tempfile
 import asyncio
+from contextlib import asynccontextmanager
+from fastmcp import FastMCP
+
+@asynccontextmanager
+async def app_lifespan(server):
+    await init_db()
+    print("Expense Tracker database initialized")
+
+    try:
+        yield
+    finally:
+        print("Expense Tracker shutting down")
+
+# Initialize MCP server
+mcp = FastMCP("ExpenseTracker", lifespan=app_lifespan)
 
 # Database path
 DB_PATH = os.environ.get("EXPENSE_DB_PATH",os.path.join(tempfile.gettempdir(), "expenses.db"))
 
 # Categories JSON Path
 CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "../../categories.json")
-
-# Initialize MCP server
-mcp = FastMCP("ExpenseTracker")
 
 # Initialize database
 async def init_db():
@@ -35,9 +47,6 @@ async def init_db():
     except Exception as e:
         print(f"Database initialization error : {e}")
         raise
-
-
-asyncio.run(init_db())
 
 # MCP Tool: Add Expense
 @mcp.tool()
